@@ -1,19 +1,16 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 class User(AbstractUser):
-    ROLE_CHOICES = [
-        ('admin', 'Admin'),
-        ('teacher', 'Teacher'),
-        ('student', 'Student'),
-    ]
+    # Custom user fields can be added here
+    pass
 
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
-    attendance_records = models.JSONField(default=dict)
 
-    def record_attendance(self, date, status):
-        self.attendance_records[date] = status
-        self.save()
+class Attendance(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=[('present', 'Present'), ('absent', 'Absent')])
 
-    def get_attendance(self):
-        return self.attendance_records
+    def __str__(self):
+        return f'{self.user.username} - {self.date} - {self.status}'
